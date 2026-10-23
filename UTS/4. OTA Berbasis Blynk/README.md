@@ -34,7 +34,6 @@ Kode ini adalah pengembangan dari Modul 3. Terdapat dua modifikasi krusial: pena
 #define BLYNK_TEMPLATE_NAME "ets"
 #define BLYNK_AUTH_TOKEN "lkGBVE7mpjUivZKLRAMQC1MmiPxUPA4K"
 
-// WAJIB UNTUK OTA: Deklarasi Versi Perangkat Lunak
 #define BLYNK_FIRMWARE_VERSION "2.0.0"
 
 #include <WiFi.h>
@@ -44,13 +43,11 @@ Kode ini adalah pengembangan dari Modul 3. Terdapat dua modifikasi krusial: pena
 char ssid[] = "alam";      
 char pass[] = "alam1234";  
 
-// Deklarasi Pin
 const int led = 4;
 const int in1 = 26;
 const int in2 = 27;
 const int ena = 14;
 
-// Variabel Global (Dimodifikasi untuk pembuktian OTA)
 String currentDirection = "UPDATE V2 SUKSES";
 int currentSpeed = 0;
 
@@ -74,7 +71,6 @@ void setup() {
   Serial.println("Menghubungkan ke WiFi dan Blynk...");
   Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
 
-  // Mendorong teks pembuktian ke layar HP saat booting pertama setelah update
   updateBlynkDisplay(); 
 }
 
@@ -82,7 +78,6 @@ void loop() {
   Blynk.run();
 }
 
-// --- FUNGSI BLYNK (Sama seperti Modul 3) ---
 BLYNK_WRITE(V1) {
   if (param.asInt() == 1) {
     currentDirection = "MAJU";
