@@ -4,7 +4,7 @@
 | :-------------- | :------------ |
 | **Mata Kuliah** | Robotika A081 |
 | **Nama**        | Restu Alam    |
-| **NPM**     | 24081010352   |
+| **NPM**         | 24081010352   |
 
 ---
 
@@ -18,7 +18,7 @@
 
 - 1x Mikrokontroler ESP32 (DevKit)
 - 1x Motor Driver L298N
-- 1x Motor DC (Aktuator) & 1x LED
+- 1x Motor DC (Aktuator) & 1x LED Eksternal
 - Kabel Jumper & Breadboard
 - Kabel USB (sebagai jalur daya dan komunikasi serial)
 
@@ -32,8 +32,9 @@
 | GND                  | GND              | Common Ground ESP32 dan L298N |
 | Anoda LED (+)        | D4               | Indikator visual sistem ON    |
 
-![Foto Rangkaian Fisik](eksperimenFisik.png)
-_(Keterangan: Dokumentasi perakitan perangkat keras Kit iMCLab untuk Modul 1)_
+![Foto Rangkaian Fisik](gambar/rangkaian.png)
+
+_(Keterangan: Dokumentasi perakitan perangkat keras Kit iMCLab untuk Modul 1. Memperlihatkan jalur data dari ESP32 ke driver L298N serta sistem Common Ground)_
 
 ## 4. Source Code (Arduino IDE)
 
@@ -88,21 +89,31 @@ void loop() {
 }
 ```
 
-## 5. Analisis dan Pembahasan Riset
+## 5. Dokumentasi dan Analisis Riset
 
-Analisis Komunikasi Serial:
-Pada eksperimen ini, operasi ON/OFF tidak diatur menggunakan penundaan waktu otomatis (delay), melainkan dikontrol secara interaktif berbasis kueri. Fungsi Serial.available() bertindak sebagai pendengar ( listener ) yang memantau apakah ada paket data yang masuk melalui port USB.
+### 5.1. Analisis Komunikasi Serial dan Parsing String
 
-![Log Serial Monitor](serialMonitor.png)
-_(Keterangan: Respons ESP32 pada Serial Monitor saat menerima instruksi ON dan OFF)_
+Pada eksperimen ini, operasi ON/OFF tidak diatur menggunakan penundaan waktu otomatis (delay), melainkan dikontrol secara interaktif berbasis kueri. Fungsi Serial.available() bertindak sebagai pendengar (listener) yang memantau apakah ada paket data yang masuk melalui port USB.
 
-Ketika pengguna mengetikkan "ON", fungsi Serial.readStringUntil() akan menangkap urutan karakter tersebut dan mikrokontroler segera mengeksekusi perintah pemicuan pin GPIO ke status HIGH.
+Penggunaan fungsi perintah.trim() pada kode merupakan langkah troubleshooting perangkat lunak (software) yang krusial. Fungsi ini membersihkan spasi ekstra atau karakter tersembunyi seperti carriage return (\r) yang sering terikut saat menekan tombol Enter di Serial Monitor, sehingga logika komparasi String tidak mengalami kegagalan.
 
-Analisis Hardware:
-Fungsi analogWrite(ena, 255) digunakan untuk memberikan daya 100% kepada driver L298N saat perintah "ON" diterima. Saat perintah "OFF" diterima, sistem mematikan semua sinyal kontrol (LOW) serta mengosongkan nilai pin ENA ke 0 untuk memastikan aktuator berhenti secara total.
+### 5.2. Pengujian Kondisi Aktif (Perintah "ON")
 
-Penggunaan fungsi perintah.trim() pada kode juga merupakan langkah troubleshooting perangkat lunak ( software ) yang krusial untuk mencegah kegagalan pembacaan logika akibat adanya karakter tersembunyi seperti carriage return (\r) yang sering terikut saat menekan tombol Enter di Serial Monitor.
+![Foto Serial Monitor](gambar/serialMonitorOnOff.png)
+(Keterangan: Respons ESP32 pada Serial Monitor saat menerima instruksi ON)
+
+![Foto Rangkaian Fisik](gambar/eksperimenFisikOn.png)
+(Keterangan: Motor DC berputar di kecepatan maksimal dan LED eksternal menyala sebagai indikator visual)
+
+Pembahasan Hardware: Ketika pengguna mengetikkan "ON", mikrokontroler segera mengeksekusi perintah pemicuan pin GPIO ke status HIGH. Fungsi analogWrite(ena, 255) digunakan untuk membuka gerbang PWM secara penuh (100% Duty Cycle pada skala 8-bit), memberikan distribusi daya tegangan maksimal kepada aktuator melalui driver L298N.
+
+### 5.3. Pengujian Kondisi Berhenti (Perintah "OFF")
+
+![Foto Rangkaian Fisik](gambar/eksperimenFisikOff.png)
+(Keterangan: Putaran aktuator terhenti total dan LED indikator padam)
+
+Pembahasan Hardware: Saat antarmuka logika menerima instruksi "OFF", sistem mengeksekusi pemutusan daya. Semua sinyal kontrol relai arah (in1 dan in2) dikembalikan ke status LOW, serta nilai pin ENA diturunkan ke 0 untuk memastikan putaran motor terhenti tanpa adanya sisa tegangan (residual voltage) pada terminal L298N.
 
 ## 6. Kesimpulan
 
-Mikrokontroler mampu membaca instruksi dari dunia luar (melalui port Serial USB) dan menerjemahkannya ke dalam aksi fisik (aktuasi motor). Logika pemrograman string parsing yang tepat dibutuhkan agar mikrokontroler tidak salah dalam menerjemahkan input pengguna sebelum mengirimkan sinyal tegangan ke driver L298N.
+Mikrokontroler mampu bertindak sebagai unit pemroses sentral yang membaca instruksi dari dunia luar (melalui port Serial USB) dan menerjemahkannya ke dalam aksi fisik (aktuasi motor). Logika pemrograman string parsing yang akurat dan bersih (melalui implementasi .trim()) sangat dibutuhkan agar mikrokontroler tidak salah dalam menafsirkan input pengguna sebelum mendistribusikan sinyal tegangan ke driver L298N.
