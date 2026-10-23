@@ -113,6 +113,7 @@ Ketika program dijalankan dan menerima instruksi ON, sistem masuk ke perlindunga
 ![Foto Terminal](gambar/TerminalOn.png)
 (Keterangan: Respons Shell Thonny saat menerima instruksi 'ON')
 
+
 ![Foto Rangkaian Fisik](gambar/eksperimenOn.png)
 (Keterangan: Rangkaian fisik saat mode Standby. Aktuator siap bekerja, namun kedua LED dan motor belum menerima siklus daya)
 
@@ -122,17 +123,21 @@ Pembahasan Hardware: Secara logika, ESP32 telah mengunci gerbang arah relai (in1
 Pengujian dinamika arus PWM dibuktikan dengan memberikan perintah variasi naik (+) dan turun (-).
 
 Kondisi Kecepatan Rendah (Perintah '-'):
+
 ![Foto Terminal](gambar/Terminal-.png)
 (Keterangan: Penurunan variabel memori status saat perintah '-' dieksekusi)
 
-![Foto Rangkaian Fisik](gambar/eksperimen-.png)
+
+![Foto Rangkaian Fisik](gambar/eksperimenKecepatanRendah.png)
 (Keterangan: Motor berputar lambat. LED Internal (biru) dan LED Eksternal menyala redup secara sinkron)
 
 Kondisi Kecepatan Tinggi (Perintah '+'):
+
 ![Foto Terminal](gambar/Terminal+.png)
 (Keterangan: Kenaikan variabel memori saat perintah '+' diinput, menguji batas limitasi / clamping atas)
 
-![Foto Rangkaian Fisik](gambar/eksperimen+.png)
+
+![Foto Rangkaian Fisik](gambar/eksperimenKecepatanTinggi.png)
 (Keterangan: Motor berputar sangat kencang (100% Duty Cycle), diiringi pendaran cahaya maksimal pada kedua LED)
 
 Pembahasan Konversi & Paralelisme:
